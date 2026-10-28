@@ -1,0 +1,29 @@
+
+name: Build T321 Dashboard EXE
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+permissions:
+  contents: read
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+      - name: Build EXE
+        run: pyinstaller --noconfirm --clean --windowed --name T321_Dashboard t321_dashboard.py
+      - name: Package
+        run: Compress-Archive -Path dist\T321_Dashboard\* -DestinationPath T321_Dashboard_Windows.zip
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: T321_Dashboard_Windows
+          path: T321_Dashboard_Windows.zip
